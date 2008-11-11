@@ -249,10 +249,10 @@ As mentioned at the beginning, this was simple example which shows how to set si
 Here is the list of configuration files which are used in this document. They should work if directly copied into appropriate directory. It is recommended to change default passwords though.
 
 For gnugk:
-  * gnugk.ini
+  * [HowtoBsdradiusAndGnugkGnugkIni gnugk.ini]
 
 For BSDRadius:
-  * etc/bsdradius/bsdradiusd.conf
-  * etc/bsdradius/clients.conf
-  * etc/bsdradius/mod_sql.conf
-  * etc/bsdradius/modules.conf
+  * [HowtoBsdradiusAndGnugkBsdradiusdConf etc/bsdradius/bsdradiusd.conf]
+  * [HowtoBsdradiusAndGnugkClientsConf etc/bsdradius/clients.conf]
+  * [HowtoBsdradiusAndGnugkModSqlConf etc/bsdradius/mod_sql.conf]
+  * [HowtoBsdradiusAndGnugkModulesConf etc/bsdradius/modules.conf]
