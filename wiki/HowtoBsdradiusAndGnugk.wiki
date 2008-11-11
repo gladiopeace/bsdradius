@@ -1,4 +1,4 @@
-#labels bsdradius,billing,howto
+#labels bsdradius,billing,howto,Featured
 = Introduction =
 
 This step-by-step guide is attempt to explain how to setup and configure BSDRadius to perform AAA requests from GnuGK gatekeeper. This procedure generally should fit any H.323 device. The aim is to provide AAA from database, i.e. we will keep user records in database and record Accounting requests to database rather than text file.
