@@ -1,3 +1,4 @@
+#labels bsdradius,howto,billing
 {{{
 # Configure loadable Bsdradius modules here.
 # Use modules name as section name (in square brackets)
