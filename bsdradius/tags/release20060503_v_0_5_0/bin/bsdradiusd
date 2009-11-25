@@ -1,0 +1,6 @@
+#!/bin/sh
+
+PYTHONPATH=
+export PYTHONPATH
+
+exec /usr/local/bin/bsdradiusd.py $@

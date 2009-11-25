@@ -1,0 +1,5 @@
+recursive-include doc *
+recursive-include examples *.py *.conf *.txt *.html *.css *.tmpl
+recursive-include webstuff *.py
+
+prune examples/templates/compiled

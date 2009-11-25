@@ -1,0 +1,28 @@
+
+# initialize web application (user_func = callback)
+init(user_func)
+
+# set HTTP response
+response(code, descr)
+
+# add HTTP header
+header(key, value)
+
+# output content
+output(data)
+
+# retrieve variables (GET, POST, environment, cookie)
+getvar_get(name)
+getvar_post(name)
+getvar_env(name)
+getvar_cookie(name)
+
+# get variable from anywhere
+getvar(name)
+
+# redirect, get current uri
+redirect(where)
+current_url(query_args)
+
+# add a cookie header
+setcookie(name, value, expire = 0, path = '/', domain = None)

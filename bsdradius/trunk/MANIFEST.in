@@ -1,0 +1,8 @@
+recursive-include bin *.py
+recursive-include bsdradius *.py
+recursive-include etc *
+recursive-include sql *
+recursive-include user_modules *
+recursive-include dictionaries *
+recursive-include doc *
+recursive-include tools *.py *.conf

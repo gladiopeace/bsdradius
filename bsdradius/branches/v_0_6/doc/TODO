@@ -1,0 +1,11 @@
+# BSD Radius to-do list.
+
+* Make "make distribution" script.
+This script should compile BSD Radius itself and it's dependant modules into
+bytecode or even single binary. It would be very helpful in distributing closed
+source software
+
+* Define t_rm_finished_call trigger also for MySQL.
+
+* Make use of webstuff library
+

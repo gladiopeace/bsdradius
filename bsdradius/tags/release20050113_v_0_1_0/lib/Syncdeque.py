@@ -1,0 +1,178 @@
+"""
+Various synchronization queues
+"""
+
+# HeadURL		$HeadURL: file:///Z:/backup/svn/bsdradius/tags/release20050113_v_0_1_0/lib/Syncdeque.py $
+# Author:		$Author: atis $
+# File version:	$Revision: 121 $
+# Last changes:	$Date: 2006-01-13 18:21:31 +0200 (Pk, 13 Jan 2006) $
+
+
+import collections, thread
+from pyrad import packet
+
+
+class Syncdeque:
+	"""Synchronized double-ended queue"""
+
+	def __init__(self, maxsize = 0):
+		"""maxsize = 0 means infinite size"""
+		self.dq = collections.deque()
+		self.maxsize = maxsize
+
+		# create locks
+		self.access_lock = thread.allocate_lock()
+		self.get_lock = thread.allocate_lock()
+		self.empty_lock = thread.allocate_lock()
+
+
+		
+	def put(self, item):
+		self.access_lock.acquire()
+
+		# check if queue is full
+		if (self.maxsize > 0 and len(self.dq) == self.maxsize):
+			return False
+		
+		self.dq.append(item)
+
+		if self.empty_lock.locked():
+			self.empty_lock.release()
+		self.access_lock.release()
+		return True
+
+
+
+	def putleft(self, item):
+		self.access_lock.acquire()
+
+		# check if queue is full
+		if (self.maxsize > 0 and len(self.dq) == self.maxsize):
+			return False
+		
+		self.dq.appendleft(item)
+		if self.empty_lock.locked():
+			self.empty_lock.release()
+		self.access_lock.release()
+
+
+
+	def get(self):
+		self.get_lock.acquire()
+		self.access_lock.acquire()
+		if len(self.dq) == 0:
+			self.empty_lock.acquire()
+			self.access_lock.release()
+			self.empty_lock.acquire()
+			self.access_lock.acquire()
+			item = self.dq.pop()
+			if self.empty_lock.locked():
+				self.empty_lock.release()
+			self.access_lock.release()
+			self.get_lock.release()
+			return item
+
+		item = self.dq.pop()
+		self.access_lock.release()
+		self.get_lock.release()		
+		return item
+
+
+
+	def __str__(self):
+		return str(self.dq)
+
+
+
+	def __len__(self):
+		return len(self.dq)
+
+
+
+class RadiusDeque:
+
+	def __init__(self, maxauth_packets = 100, maxacct_packets = 100):
+		# init queue object
+		self.dq = collections.deque()
+
+		# create locks
+		self.access_lock = thread.allocate_lock()
+		self.get_lock = thread.allocate_lock()
+		self.empty_lock = thread.allocate_lock()
+
+		# packet counters and limits
+		self.num_auth = 0 # number of auth packets
+		self.num_acct = 0 # number of acct packets
+		self.max_auth = maxauth_packets;
+		self.max_acct = maxacct_packets;
+
+
+
+	def add_auth_packet(self, pkt):
+		"""Add auth packet"""
+		self.access_lock.acquire()
+
+		if (self.num_auth == self.max_auth):
+			del[self.num_acct]	# kill oldest auth packet
+			self.dq.append(pkt)
+		else:
+			self.dq.append(pkt)
+			self.num_auth += 1
+			
+		if self.empty_lock.locked():
+			self.empty_lock.release()
+		self.access_lock.release()
+		return True
+
+
+
+	def add_acct_packet(self, pkt):
+		"""Add accounting packet"""
+		self.access_lock.acquire()
+
+		if (self.num_acct == self.max_acct):
+			self.access_lock.release()
+			return False
+		
+		self.dq.appendleft(pkt)
+		self.num_acct += 1
+		if self.empty_lock.locked():
+			self.empty_lock.release()
+		self.access_lock.release()
+		return True
+		
+		
+
+	def remove_packet(self):
+		"""Retrieve a RADIUS packet, block if there are none"""
+		self.get_lock.acquire()
+		self.access_lock.acquire()
+		if len(self.dq) == 0:
+			self.empty_lock.acquire()
+			self.access_lock.release()
+			self.empty_lock.acquire()
+			
+			self.access_lock.acquire()
+			pkt = self.dq.pop()
+			# check packet type and decrement respective counter
+			if isinstance(pkt, packet.AuthPacket):
+				self.num_auth -= 1
+			if isinstance(pkt, packet.AcctPacket):
+				self.num_acct -= 1
+				
+			if self.empty_lock.locked():
+				self.empty_lock.release()
+			self.access_lock.release()
+			self.get_lock.release()
+			return pkt
+
+		pkt = self.dq.pop()
+		# check packet type and decrement respective counter
+		if isinstance(pkt, packet.AuthPacket):
+			self.num_auth -= 1
+		if isinstance(pkt, packet.AcctPacket):
+			self.num_acct -= 1
+		
+		self.access_lock.release()
+		self.get_lock.release()
+		return pkt

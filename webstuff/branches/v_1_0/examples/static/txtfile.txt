@@ -1,0 +1,2 @@
+This is some text in file.
+You should try to access this file as static one.

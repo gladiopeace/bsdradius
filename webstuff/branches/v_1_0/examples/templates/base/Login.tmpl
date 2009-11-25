@@ -1,0 +1,109 @@
+#errorCatcher Echo
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+
+<head>
+
+<title>Login</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<link rel="stylesheet" type="text/css" href="$webRoot/static/style/login.css" />
+
+</head>
+
+<script type="text/javascript">
+
+// store language sttong in cookie
+// set cookie expire time to 30 days from now
+function store_language()
+{
+	// get language from form
+	var newlan = document.forms.loginform.elements[0].value;
+	
+	// create cookie which expires in 30 days
+	var path = "/";
+	var today = new Date();
+	var expire = new Date();
+	nDays = 30;
+	expire.setTime(today.getTime() + 3600000*24*nDays);
+	document.cookie = "language=" + escape(newlan) + ";"
+		+ "expires="+expire.toGMTString() + ";"
+		+ "path=" + escape(path) + ";";
+}
+
+// store language settings in cookie and reload page
+function change_language()
+{
+	store_language();
+	window.location.reload();
+}
+
+</script>
+
+<body>
+
+<div id="logo">
+	<!-- logo image goes here -->
+</div>
+
+<div id="login">
+
+	<div id="login_msg">
+		$message
+	</div>
+
+	<div id="login_fields">
+
+		<form name="loginform" id="frm_login" action="$formaction" method="post">
+
+			<table id="input_table">
+
+				<tr>
+					<td class="label">$language:</td>
+					<td class="input_field">
+						<select name="lang" onchange="change_language()">
+						\#for $lang, $langName in $languageOptions.iteritems()
+							\#if $currentLanguage == $lang
+								<option value="$lang" selected="selected">$langName</option>
+							\#else
+								<option value="$lang">$langName</option>
+							\#end if
+						\#end for
+						</select>
+					</td>
+				</tr>
+
+				<tr>
+					<td class="label">$username:</td>
+					<td class="input_field">
+						<input class="text" type="text" name="username" value="$username_value" />
+					</td>
+				</tr>
+
+				<tr>
+					<td class="label">$password:</td>
+					<td class="input_field">
+						<input class="text" type="password" name="password" />
+					</td>
+				</tr>
+				
+				<tr>
+					<td class="label">&nbsp;</td>
+					<td class="input_field">
+						<input class="button" type="submit" value="$button_text" name="login_attempt" onclick="store_language()"/>
+					</td>
+				</tr>
+
+			</table>
+
+		</form>
+
+	</div>
+
+</div>
+
+</body>
+
+</html>
