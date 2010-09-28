@@ -202,6 +202,8 @@ def simplebill_funct_acct(received):
 				# Call admission stage - we should check for entry in rate table
 				debug ('Accounting Stop Message Received')
 				rate = simplebill_get_rate(account, received)
+				debug ("Rate")
+				debug (rate)
 				# set up defaults
 				if not 'h323-connect-time' in received:
 					received['h323-connect-time'] = received['h323-setup-time']
@@ -212,6 +214,13 @@ def simplebill_funct_acct(received):
 				for key, value in tmp.iteritems():
 					if value != None:
 						received[key] = str(value)
+				# detect calling IP properly
+				if 'Framed-IP-Address' in received:
+				    calling_ip = received['Framed-IP-Address'][0]
+				elif 'h323-gw-id' in received:
+				    calling_ip = received['h323-gw-id'][0]
+				else:
+				    calling_ip = '0.0.0.0'
 				# insert call into cdr table
 				query = """
 INSERT INTO cdr 
@@ -228,7 +237,7 @@ INSERT INTO cdr
 					'calledNum': received['Called-Station-Id'][0], 
 					'h323ConfId': received['h323-conf-id'][0], 
 					'duration': received['Acct-Session-Time'][0], 
-					'callingIp': received['Framed-IP-Address'][0], 
+					'callingIp': calling_ip, 
 					'calledIp': received['h323-remote-address'][0]}
 				dbh = DatabaseConnection.getHandler('simplebill')
 				insertCdr = dbh.execute(query)
@@ -315,7 +324,7 @@ SELECT name, password, status, rateTableId, balance , userId
 def simplebill_get_rate(account, received):
 	dbh = DatabaseConnection.getHandler('simplebill')
 	query = """
-SELECT ratePerMinute, ratePerCall, increment, grace, minDur
+SELECT ratePerMinute, ratePerCall, increment, grace, minDur,
  userId, s1.rateTableId, s3.destCode
  FROM users s1 
  LEFT JOIN rateItems s2 ON s1.rateTableId = s2.rateTableId 
