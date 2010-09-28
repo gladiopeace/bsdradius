@@ -145,6 +145,11 @@ def simplebill_funct_authz(received, check, reply):
 			reply['h323-credit-amount'] = "h323-credit-amount=%.2f" % (account['balance']) # balance column
 			reply['h323-billing-model'] = "h323-billing-model=1"
 			return True
+	elif account['balance'] <= 0:
+	        debug ('Account balance below zero')
+                reply['h323-return-code'] = "h323-return-code=2"
+                reply['h323-credit-amount'] = "h323-credit-amount=0.00"
+                return False        
 	else:
 		debug ('Account not found')
 		# Return 0 remaining credit and invalid account code
@@ -288,7 +293,6 @@ SELECT name, password, status, rateTableId, balance , userId
  WHERE name= '%s' 
   %s
   AND status = 1 
-  AND balance > 0
 """ % (received['User-Name'][0],passwd_check)
 	dbh = DatabaseConnection.getHandler('simplebill')
 	acctData = dbh.execGetRowsOne(query)
