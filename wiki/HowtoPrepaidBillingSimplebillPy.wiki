@@ -104,6 +104,12 @@ def simplebill_funct_authz(received, check, reply):
 	# see if account was found
 	if account:
 		debug ('Account found')
+	        if account['balance'] <= 0:
+	                debug ('Account balance below zero')
+                        reply['h323-return-code'] = "h323-return-code=2"
+                        reply['h323-credit-amount'] = "h323-credit-amount=0.00"
+                        return False  
+
 		authType = check.get('Auth-Type', [None])[0]
 		if not authType:
 			# just set the auth type to "simplebill" if no previous modules have touched it.
@@ -145,11 +151,6 @@ def simplebill_funct_authz(received, check, reply):
 			reply['h323-credit-amount'] = "h323-credit-amount=%.2f" % (account['balance']) # balance column
 			reply['h323-billing-model'] = "h323-billing-model=1"
 			return True
-	elif account['balance'] <= 0:
-	        debug ('Account balance below zero')
-                reply['h323-return-code'] = "h323-return-code=2"
-                reply['h323-credit-amount'] = "h323-credit-amount=0.00"
-                return False        
 	else:
 		debug ('Account not found')
 		# Return 0 remaining credit and invalid account code
