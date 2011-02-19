@@ -34,7 +34,7 @@ data into logfile.
 # HeadURL		$HeadURL: file:///Z:/backup/svn/bsdradius/trunk/bsdradius/serverModules/dumpPacket.py $
 # Author:		$Author: valts $
 # File version:	$Revision: 236 $
-# Last changes:	$Date: 2006-06-27 13:48:36 +0300 (Ot, 27 Jūn 2006) $
+# Last changes:	$Date: 2006-06-27 13:48:36 +0300 (Ot, 27 Jun 2006) $
 
 
 import time
@@ -120,7 +120,10 @@ def dumpFailedAcctPacket(received):
 		Input: (packet) accounting packet
 		Output: none
 	"""
-	doIt = radParsedConfig['BEHAVIOR'].get('dump_failed_acct', True)
+	if radParsedConfig == None:
+		doIt = True
+	else:
+		doIt = radParsedConfig['BEHAVIOR'].get('dump_failed_acct', True)
 	if getbool(doIt):
 		filePath = "%s/%s/acct_failed/%s" % (getLogDir(), received['Client-IP-Address'][0], getFileName())
 		dumpPacket(received, filePath, PACKET_TYPE_ACCT)
@@ -136,7 +139,10 @@ def dumpUnhandledAcctPacket(received):
 		Input: (packet) accounting packet
 		Output: none
 	"""
-	doIt = radParsedConfig['BEHAVIOR'].get('dump_unh_acct', True)
+	if radParsedConfig == None:
+		doIt = True
+	else:
+		doIt = radParsedConfig['BEHAVIOR'].get('dump_unh_acct', True)
 	if getbool(doIt):
 		filePath = "%s/%s/acct_unhandled/%s" % (getLogDir(), received['Client-IP-Address'][0], getFileName())
 		dumpPacket(received, filePath, PACKET_TYPE_ACCT)
@@ -163,7 +169,10 @@ def dumpFailedAuthPacket(received):
 		Input: (packet) authorization packet
 		Output: none
 	"""
-	doIt = radParsedConfig['BEHAVIOR'].get('dump_failed_auth', True)
+	if radParsedConfig == None:
+		doIt = True
+	else:
+		doIt = radParsedConfig['BEHAVIOR'].get('dump_failed_auth', True)
 	if getbool(doIt):
 		filePath = "%s/%s/auth_failed/%s" % (getLogDir(), received['Client-IP-Address'][0], getFileName())
 		dumpPacket(received, filePath, PACKET_TYPE_AUTH)
@@ -177,7 +186,10 @@ def dumpUnhandledAuthPacket(received):
 		Input: (packet) authorization packet
 		Output: none
 	"""
-	doIt = radParsedConfig['BEHAVIOR'].get('dump_unh_auth', False)
+	if radParsedConfig == None:
+		doIt = False
+	else:
+		doIt = radParsedConfig['BEHAVIOR'].get('dump_unh_auth', False)
 	if getbool(doIt):
 		filePath = "%s/%s/auth_unhandled/%s" % (getLogDir(), received['Client-IP-Address'][0], getFileName())
 		dumpPacket(received, filePath, PACKET_TYPE_AUTH)
