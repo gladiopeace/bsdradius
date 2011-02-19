@@ -106,11 +106,9 @@ dataFiles = [
 # call setup
 dist = distutils.core.setup(
 	name = 'bsdradius',
-	version = '0.5.0',
-	author = 'Data Tech Labs',
+	version = '0.8.0',
+	author = 'DataTechLabs',
 	author_email = 'info@datatechlabs.com',
-#	maintainer = 'Valts Mazurs',
-#	maintainer_email = 'valts@datatechlabs.com',
 	url = 'http://www.datatechlabs.com',
 	description = 'BSD Radius server',
 	packages = ['bsdradius', 'bsdradius.pyrad', 'bsdradius.serverModules',
