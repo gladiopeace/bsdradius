@@ -106,7 +106,7 @@ dataFiles = [
 # call setup
 dist = distutils.core.setup(
 	name = 'bsdradius',
-	version = '0.7.0',
+	version = '0.7.2',
 	author = 'Data Tech Labs',
 	author_email = 'info@datatechlabs.com',
 #	maintainer = 'Valts Mazurs',
