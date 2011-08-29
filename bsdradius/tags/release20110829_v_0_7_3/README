@@ -1,0 +1,138 @@
+BSD Radius Server
+(c) Data Tech Labs 2005,2006
+
+==============================================================================
+INSTALL
+==============================================================================
+This is RADIUS server written in pure Python.
+To install BSD Radius use setup.py script.
+Example:
+%> python setup.py install
+
+You can install the server under specific directory path using:
+%> python setup.py install --prefix=/directory/of/your/choice
+
+Run bsdradiusd -h to get list of supported command line attributes.
+%> bsdradiusd -h
+
+Please read bsdradiusd.conf, modules.conf and user_modules.conf carefully for
+complete view of possible configuration options.
+
+==============================================================================
+DATABASE SUPPORT
+==============================================================================
+To get database support you have to install:
+* psycopg (http://www.initd.org/projects/psycopg1) for postgresql
+  (http://www.postgresql.org) support. Support for psycopg2 is comming soon.
+* MySQLdb (http://sourceforge.net/projects/mysql-python) for MySQL
+  (http://www.mysql.com) support.
+* Support for Oracle and SQLite also is under development.
+
+Create database table structure using one of files in bsdradius-x.x.x/sql
+directory. Use file with preffered database engine name in it.
+
+==============================================================================
+RADIUS CLIENT
+==============================================================================
+You can use tools/bsdradclient.py for testing BSDRadius or any other RADIUS
+server. bsdradclient.py is very comfortable tool for testing your own modules
+within BSDRadius. It eliminates neccesserity for external RADIUS client which
+should be used for real life tests only.
+
+Run bsdradclient -h to get list of supported command line attributes.
+%> bsdradclient -h
+
+Take a look at bsdradclient.conf sample configuration file. It contains
+attributes which will be sent to RADIUS server. You can use "#" (at the
+beginning of line only) for comments.
+
+Bsdradclient generates some random RADIUS attributes such as h323-conf-id,
+Acct-Session-Id, Acct-Input-Octets, Acct-Output-Octets, Acct-Session-Time,
+Acct-Terminate-Cause. It happens only if those attributes are not in the
+configuration file.
+
+
+==============================================================================
+MODULE API
+==============================================================================
+Short intro in using BSDRadius module API.
+
+Startup and shutdown function receive no attributes.
+Authorization and authentication functions receive 3 attributes:
+received packet data, check items and reply data. Accounting functions receive
+one attribute - received packet data only.Since python uses references
+for passing variables to functions it is always possible to modify contents of
+all passed attributes. All these attributes are dictionaries in form:
+{'attribute_name': ['value0', 'value1', 'value2']}.
+
+Example:
+from bsdradius.logger import *
+def authorization(received, check, reply):
+  username = received['User-Name'][0]
+  password = received['User-Password'][0]
+  debug ("Username: %s; password: %s" % (username, password))
+  check['Auth-Type'] = ['testmodule']
+  reply['Reply-Message'] = ['Hey, Joe!']
+  
+To fully evaluate BSDRadius's logging facilities feel safe to import all items
+from bsdradius.logger python module. It will provide you with easy to use 
+functions:
+* debug - for debug messages
+* info - for informative messages
+* error - for logging error messages
+These functions accept any number of parameters. All parameters will be
+converted to strings and joined togeather.
+You can read the documentation of logger module this way:
+%> cd bsdradius-x.x.x
+%> pydoc bsdradius.logger
+
+Example:
+from bsdradius.logger import *
+def authorization(received, check, reply):
+  debug ('This is debug message')
+  info ('we ', 'would ', 'like', ' to', ' pass ', 'some ', 'info')
+  error ('Dont do this again!!!')
+  
+For database access you can use DatabaseConnection class from
+bsdradius.DatabaseConnection module. Read DatabaseConnection's documentation
+for full list of usable methods. Use pydoc for comfortable documentation
+reading:
+%> cd bsdradius-x.x.x
+%> pydoc bsdradius.DatabaseConnection
+
+Example:
+from bsdradius.DatabaseConnection import DatabaseConnection
+def startup():
+  dbh = DatabaseConnection.getHandler('my_handler', 'mysql')
+  dbh.connect(host = '127.0.0.1', user = 'testuser',
+    password = 'somepass', dbname = 'test')
+def authorization(received, check, reply):
+  dbh = DatabaseConnection.getHandler('my_handler')
+  data = dbh.execGetRows('select * from sometable')
+  print data[0][0]
+  
+Since every module can have it's own custom config file (defined with
+configfile directive in user_modules.conf or modules.conf) BSDRadius reads and
+parses each configuration file when loading modules. Parsed configuration data
+are available as global variable "radParsedConfig" in each module. If there was
+no configfile set in modules configuration file then variable "radParsedConfig"
+is None.
+
+Example:
+# in user_modules.conf:
+[my_module]
+configfile = my_module.conf
+accounting_module = my_module
+accounting_function = authorization
+
+# in my_module.py:
+from bsdradius.logger import *
+def accounting(received):
+  if radParsedConfig == None:
+    error ('No configuration data was parsed')
+  else:
+    debug ("Parsed configuration: ", radParsedConfig)
+	
+
+Please see BSDRadius server modules in bsdradius-x.x.x/bsdradius/serverModules/ 
+and sample modules in bsdradius-x.x.x/user_modules/ for real code.
