@@ -1,0 +1,10 @@
+# BSD Radius to-do list.
+
+* Make "make distribution" script.
+This script should compile BSD Radius itself and it's dependant modules into
+bytecode or even single binary. It would be very helpful in distributing closed
+source software
+
+* We should make some more options available in config file to control BSD Radius
+logging behavior. It should be possible to enable/disable logging of failed and/or
+unhandled requests.
