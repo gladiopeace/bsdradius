@@ -88,8 +88,21 @@ class RadClient(object):
 			raise RadClientError("RADIUS server does not reply")
 		except socket.error, error:
 			raise RadClientError("Network error: " + error[1])
-	
-	
+
+
+	def bind(self, addr):
+		"""Bind socket to an address.
+			Binding the socket used for communicating to an address can be
+			usefull when working on a machine with multiple addresses.
+			Input: (pyrad.packet.Packet) Address tuple (ip, port for AF_INET)
+		"""
+		try:
+			self.srv.bind(addr)
+		except socket.error, error:
+			print "Network error: " + error[1]
+			sys.exit(1)
+
+
 	@classmethod
 	def genAcctSessionId(cls, length = 16, symbols = None):
 		"""Generate random string for Acct-Session-Id.
