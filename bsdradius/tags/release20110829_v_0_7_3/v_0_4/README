@@ -1,7 +1,0 @@
-BSD Radius Server
-(c) Data Tech Labs 2005,2006
-
-This is RADIUS server written in pure Python.
-To install BSD Radius use setup.py script.
-Example:
-$> python setup.py install
